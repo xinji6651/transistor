@@ -326,11 +326,11 @@ class SwappablePlayer(private var player: Player) : Player {
 //        player.previous()
 //    }
 
-    @Deprecated("Deprecated in Java")
-    @OptIn(UnstableApi::class)
-    override fun seekToPreviousWindow() {
-        player.seekToPreviousWindow()
-    }
+//    @Deprecated("Deprecated in Java")
+//    @OptIn(UnstableApi::class)
+//    override fun seekToPreviousWindow() {
+//        player.seekToPreviousWindow()
+//    }
 
     override fun seekToPreviousMediaItem() {
         player.seekToPreviousMediaItem()
@@ -344,33 +344,33 @@ class SwappablePlayer(private var player: Player) : Player {
         player.seekToPrevious()
     }
 
-    @Deprecated("Deprecated in Java")
-    @OptIn(UnstableApi::class)
-    override fun hasNext(): Boolean {
-        return player.hasNext()
-    }
+//    @Deprecated("Deprecated in Java")
+//    @OptIn(UnstableApi::class)
+//    override fun hasNext(): Boolean {
+//        return player.hasNext()
+//    }
 
-    @Deprecated("Deprecated in Java")
-    @OptIn(UnstableApi::class)
-    override fun hasNextWindow(): Boolean {
-        return player.hasNextWindow()
-    }
+//    @Deprecated("Deprecated in Java")
+//    @OptIn(UnstableApi::class)
+//    override fun hasNextWindow(): Boolean {
+//        return player.hasNextWindow()
+//    }
 
     override fun hasNextMediaItem(): Boolean {
         return player.hasNextMediaItem()
     }
 
-    @Deprecated("Deprecated in Java")
-    @OptIn(UnstableApi::class)
-    override fun next() {
-        player.next()
-    }
+//    @Deprecated("Deprecated in Java")
+//    @OptIn(UnstableApi::class)
+//    override fun next() {
+//        player.next()
+//    }
 
-    @Deprecated("Deprecated in Java")
-    @OptIn(UnstableApi::class)
-    override fun seekToNextWindow() {
-        player.seekToNextWindow()
-    }
+//    @Deprecated("Deprecated in Java")
+//    @OptIn(UnstableApi::class)
+//    override fun seekToNextWindow() {
+//        player.seekToNextWindow()
+//    }
 
     override fun seekToNextMediaItem() {
         player.seekToNextMediaItem()

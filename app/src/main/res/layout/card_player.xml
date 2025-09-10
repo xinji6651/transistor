@@ -204,6 +204,20 @@
             app:layout_constraintTop_toBottomOf="@+id/player_extended_previous_metadata_button"
             app:srcCompat="@drawable/ic_player_extended_copy_content_24dp" />
 
+        <androidx.mediarouter.app.MediaRouteButton
+            android:id="@+id/cast_button"
+            style="@style/CustomMediaRouteButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:mediaRouteTypes="user"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/player_extended_copy_station_metadata_button"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/player_extended_copy_station_metadata_button"
+            tools:visibility="visible" />
+
         <ImageButton
             android:id="@+id/sleep_timer_start_button"
             android:layout_width="wrap_content"
@@ -256,7 +270,7 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:visibility="gone"
-            app:constraint_referenced_ids="player_extended_streaming_link_icon,player_extended_streaming_link_headline,player_extended_streaming_link,player_extended_previous_metadata_button,player_extended_metadata_headline,player_extended_metadata_history,player_extended_next_metadata_button,player_extended_copy_station_metadata_button,sleep_timer_start_button"
+            app:constraint_referenced_ids="player_extended_streaming_link_icon,player_extended_streaming_link_headline,player_extended_streaming_link,player_extended_previous_metadata_button,player_extended_metadata_headline,player_extended_metadata_history,player_extended_next_metadata_button,player_extended_copy_station_metadata_button,sleep_timer_start_button,cast_button"
             tools:visibility="gone" />
 
         <androidx.constraintlayout.widget.Group
