@@ -41,6 +41,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.transition.MaterialSharedAxis
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
@@ -102,14 +103,15 @@ class PlayerFragment: Fragment(),
                 }
             })
 
+        // Set exit transition for PlayerFragment
+        exitTransition = MaterialSharedAxis(MaterialSharedAxis.X, /* forward= */ true)
+        reenterTransition = MaterialSharedAxis(MaterialSharedAxis.X, /* forward= */ false)
+
         // create view model and observe changes in collection view model
         collectionViewModel = ViewModelProvider(this)[CollectionViewModel::class.java]
 
         // create collection adapter
-        collectionAdapter = CollectionAdapter(
-            requireContext(),
-            this as CollectionAdapter.CollectionAdapterListener
-        )
+        collectionAdapter = CollectionAdapter(requireContext(), this as CollectionAdapter.CollectionAdapterListener, this as YesNoDialog.YesNoDialogListener)
     }
 
 
@@ -310,10 +312,8 @@ class PlayerFragment: Fragment(),
         // enable swipe to delete
         val swipeToDeleteHandler = object : UiHelper.SwipeToDeleteCallback(requireContext()) {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                // ask user
-                val adapterPosition: Int = viewHolder.adapterPosition
-                val dialogMessage: String = "${getString(R.string.dialog_yes_no_message_remove_station)}\n\n- ${collection.stations[adapterPosition].name}"
-                YesNoDialog(this@PlayerFragment as YesNoDialog.YesNoDialogListener).show(context = requireContext(), type = Keys.DIALOG_REMOVE_STATION, messageString = dialogMessage, yesButton = R.string.dialog_yes_no_positive_button_remove_station, payload = adapterPosition)
+                // ask user and delete station if confirmed
+                collectionAdapter.showDeleteStationDialog(this@PlayerFragment as YesNoDialog.YesNoDialogListener, viewHolder.adapterPosition)
             }
         }
         val swipeToDeleteItemTouchHelper = ItemTouchHelper(swipeToDeleteHandler)
@@ -424,9 +424,7 @@ class PlayerFragment: Fragment(),
 
     /* Observe view model of collection of stations */
     private fun observeCollectionViewModel() {
-        collectionViewModel.collectionLiveData.observe(
-            this,
-            Observer<Collection> { updatedCollection ->
+        collectionViewModel.collectionLiveData.observe(this, Observer<Collection> { updatedCollection ->
                 // get BaseMainActivity instance
                 val mainActivity = activity as? BaseMainActivity
 
@@ -445,8 +443,9 @@ class PlayerFragment: Fragment(),
                 if (mainActivity != null && collection.stations.isNotEmpty()) {
                     val currentStation: Station = collection.stations[PreferencesHelper.loadLastPlayedStationPosition().coerceIn(0, collection.stations.size - 1)]
                     mainActivity.updatePlayerViews(currentStation)
+                    mainActivity.layout.showPlayer()
                 } else if (mainActivity != null && collection.stations.isEmpty()) {
-                    // todo hide the player
+                    mainActivity.layout.hidePlayer()
                 }
             })
     }

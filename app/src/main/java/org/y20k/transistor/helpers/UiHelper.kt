@@ -15,7 +15,10 @@
 package org.y20k.transistor.helpers
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
@@ -24,12 +27,20 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.createBitmap
+import androidx.core.graphics.drawable.toBitmap
+import androidx.core.graphics.toColorInt
+import androidx.palette.graphics.Palette
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.snackbar.Snackbar
 import org.y20k.transistor.Keys
 import org.y20k.transistor.R
+import java.io.ByteArrayOutputStream
 
 
 /*
@@ -41,12 +52,18 @@ object UiHelper {
     private val TAG: String = UiHelper::class.java.simpleName
 
 
+    /* Get scaling factor from display density */
+    fun getDensityScalingFactor(context: Context): Float {
+        return context.resources.displayMetrics.density
+    }
+
+
     /* Sets layout margins for given view in DP */
     fun setViewMargins(context: Context, view: View, left: Int = 0, right: Int = 0, top: Int= 0, bottom: Int = 0) {
-        val l: Int = (left * ImageHelper.getDensityScalingFactor(context)).toInt()
-        val r: Int = (right * ImageHelper.getDensityScalingFactor(context)).toInt()
-        val t: Int = (top * ImageHelper.getDensityScalingFactor(context)).toInt()
-        val b: Int = (bottom * ImageHelper.getDensityScalingFactor(context)).toInt()
+        val l: Int = (left * getDensityScalingFactor(context)).toInt()
+        val r: Int = (right * getDensityScalingFactor(context)).toInt()
+        val t: Int = (top * getDensityScalingFactor(context)).toInt()
+        val b: Int = (bottom * getDensityScalingFactor(context)).toInt()
         if (view.layoutParams is ViewGroup.MarginLayoutParams) {
             val p = view.layoutParams as ViewGroup.MarginLayoutParams
             p.setMargins(l, t, r, b)
@@ -62,6 +79,48 @@ object UiHelper {
         val t: Int = ((height / 100.0f) * top).toInt()
         val b: Int = ((height / 100.0f) * bottom).toInt()
         setViewMargins(context, view, l, r, t, b)
+    }
+
+
+    /* Extracts color from an image - creates the image blocking */
+    fun getMainColor(context: Context, imageUri: String, size: Int = 72): Int {
+        try {
+            // load the station image
+            val bitmap = Glide.with(context)
+                .asBitmap()
+                .load(imageUri)
+                .apply(
+                    RequestOptions()
+                        .override(size, size)
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .centerCrop()
+                )
+                .submit()
+                .get() // this blocks until the image is loaded - use only on background thread
+
+            // extract color palette from the bitmap
+            val palette: Palette = Palette.from(bitmap).generate()
+
+            // get muted and vibrant swatches
+            val vibrantSwatch = palette.vibrantSwatch
+            val mutedSwatch = palette.mutedSwatch
+
+            when {
+                vibrantSwatch != null -> {
+                    val rgb = vibrantSwatch.rgb
+                    return Color.argb(255, Color.red(rgb), Color.green(rgb), Color.blue(rgb))
+                }
+                mutedSwatch != null -> {
+                    val rgb = mutedSwatch.rgb
+                    return Color.argb(255, Color.red(rgb), Color.green(rgb), Color.blue(rgb))
+                }
+                else -> {
+                    return "#ff7d7d7d".toColorInt() // color = system_neutral1_300
+                }
+            }
+        } catch (e: Exception) {
+            return "#ff7d7d7d".toColorInt()
+        }
     }
 
 
@@ -93,17 +152,77 @@ object UiHelper {
     }
 
 
-    /* Get scaling factor from display density */
-    fun getDensityScalingFactor(context: Context): Float {
-        return context.resources.displayMetrics.density
-    }
-
-
     /* Hide keyboard */
     fun hideSoftKeyboard(context: Context, view: View) {
         val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
+
+
+    /* Get the default station image as a ByteArray */
+    fun getDefaultStationImageAsByteArray(context: Context, size: Int = 512): ByteArray {
+        val stationImageBitmap: Bitmap = ContextCompat.getDrawable(context, R.drawable.ic_default_station_image_64dp)!!.toBitmap(size, size)
+        val stream = ByteArrayOutputStream()
+        stationImageBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+        val coverByteArray: ByteArray = stream.toByteArray()
+        stationImageBitmap.recycle()
+        return coverByteArray
+    }
+
+
+    /* Creates station image on a square background with the main station image color and option padding for adaptive icons */
+    fun createSquareImage(bitmap: Bitmap, backgroundColor: Int, size: Int, adaptivePadding: Boolean): Bitmap {
+        // create background
+        val background = Paint()
+        background.style = Paint.Style.FILL
+        if (backgroundColor != -1) {
+            background.color = backgroundColor
+        } else {
+            background.color = "#ff595959".toColorInt() // color = system_neutral1_600
+        }
+        // create empty bitmap and canvas
+        val outputImage: Bitmap = createBitmap(size, size)
+        val imageCanvas: Canvas = Canvas(outputImage)
+        // draw square background
+        val right = size.toFloat()
+        val bottom = size.toFloat()
+        imageCanvas.drawRect(0f, 0f, right, bottom, background)
+        // draw input image onto canvas using transformation matrix
+        val paint = Paint()
+        paint.isFilterBitmap = true
+        imageCanvas.drawBitmap(bitmap, createTransformationMatrix(size, 0, bitmap.height.toFloat(), bitmap.width.toFloat(), adaptivePadding), paint)
+        return outputImage
+    }
+
+
+    /* Creates a transformation matrix with the given size and optional padding  */
+    private fun createTransformationMatrix(size: Int, yOffset: Int, inputImageHeight: Float, inputImageWidth: Float, scaled: Boolean): Matrix {
+        val matrix = Matrix()
+        // calculate padding
+        var padding = 0f
+        if (scaled) {
+            padding = size.toFloat() / 4f
+        }
+        // define variables needed for transformation matrix
+        var aspectRatio = 0.0f
+        var xTranslation = 0.0f
+        var yTranslation = 0.0f
+        // landscape format and square
+        if (inputImageWidth >= inputImageHeight) {
+            aspectRatio = (size - padding * 2) / inputImageWidth
+            xTranslation = 0.0f + padding
+            yTranslation = (size - inputImageHeight * aspectRatio) / 2.0f + yOffset
+        } else if (inputImageHeight > inputImageWidth) {
+            aspectRatio = (size - padding * 2) / inputImageHeight
+            yTranslation = 0.0f + padding + yOffset
+            xTranslation = (size - inputImageWidth * aspectRatio) / 2.0f
+        }
+        // construct transformation matrix
+        matrix.postTranslate(xTranslation, yTranslation)
+        matrix.preScale(aspectRatio, aspectRatio)
+        return matrix
+    }
+
 
 
     /*
@@ -244,8 +363,5 @@ object UiHelper {
     /*
      * End of inner class
      */
-
-
-
 
 }
