@@ -29,7 +29,7 @@ import com.google.android.gms.cast.framework.CastContext
 class MainActivity : BaseMainActivity() {
 
     /* Define log tag */
-    private val TAG: String = PlayerFragment::class.java.simpleName
+    private val TAG: String = MainActivity::class.java.simpleName
 
 
     /* Main class variables */

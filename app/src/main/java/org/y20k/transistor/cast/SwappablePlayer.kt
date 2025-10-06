@@ -304,33 +304,9 @@ class SwappablePlayer(private var player: Player) : Player {
         player.seekForward()
     }
 
-//    @Deprecated("Deprecated in Java")
-//    @OptIn(UnstableApi::class)
-//    override fun hasPrevious(): Boolean {
-//        return player.hasPrevious()
-//    }
-
-//    @Deprecated("Deprecated in Java")
-//    @OptIn(UnstableApi::class)
-//    override fun hasPreviousWindow(): Boolean {
-//        return player.hasPreviousWindow()
-//    }
-
     override fun hasPreviousMediaItem(): Boolean {
         return player.hasPreviousMediaItem()
     }
-
-//    @Deprecated("Deprecated in Java")
-//    @OptIn(UnstableApi::class)
-//    override fun previous() {
-//        player.previous()
-//    }
-
-//    @Deprecated("Deprecated in Java")
-//    @OptIn(UnstableApi::class)
-//    override fun seekToPreviousWindow() {
-//        player.seekToPreviousWindow()
-//    }
 
     override fun seekToPreviousMediaItem() {
         player.seekToPreviousMediaItem()
@@ -344,33 +320,9 @@ class SwappablePlayer(private var player: Player) : Player {
         player.seekToPrevious()
     }
 
-//    @Deprecated("Deprecated in Java")
-//    @OptIn(UnstableApi::class)
-//    override fun hasNext(): Boolean {
-//        return player.hasNext()
-//    }
-
-//    @Deprecated("Deprecated in Java")
-//    @OptIn(UnstableApi::class)
-//    override fun hasNextWindow(): Boolean {
-//        return player.hasNextWindow()
-//    }
-
     override fun hasNextMediaItem(): Boolean {
         return player.hasNextMediaItem()
     }
-
-//    @Deprecated("Deprecated in Java")
-//    @OptIn(UnstableApi::class)
-//    override fun next() {
-//        player.next()
-//    }
-
-//    @Deprecated("Deprecated in Java")
-//    @OptIn(UnstableApi::class)
-//    override fun seekToNextWindow() {
-//        player.seekToNextWindow()
-//    }
 
     override fun seekToNextMediaItem() {
         player.seekToNextMediaItem()
