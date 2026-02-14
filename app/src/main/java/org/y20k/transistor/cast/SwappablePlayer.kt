@@ -522,6 +522,16 @@ class SwappablePlayer(private var player: Player) : Player {
         return player.volume
     }
 
+    @OptIn(UnstableApi::class)
+    override fun mute() {
+        player.mute()
+    }
+
+    @OptIn(UnstableApi::class)
+    override fun unmute() {
+        player.unmute()
+    }
+
     override fun clearVideoSurface() {
         player.clearVideoSurface()
     }
