@@ -94,4 +94,9 @@ dependencies {
 
     implementation(libs.glide)
 
+    // Google Cast
+    implementation(libs.androidx.media3.cast)
+    implementation(libs.androidx.mediarouter)
+    implementation(libs.play.services.cast.framework)
+
 }
