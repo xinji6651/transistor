@@ -57,6 +57,7 @@ Minimalist Android internet radio player; imports M3U/PLS streams, searches radi
 - Locale config (`@xml/locales_config`) for per-app language picker.
 - radio-browser.info HTTP API — station search backend.
 - Android `Vibrator` — haptic feedback.
+- Local network permission (`ACCESS_LOCAL_NETWORK`, API 37+) — requested via Settings → "Allow Local Streams" (`SettingsFragment`); `BasePlayerService`'s load-error policy shows a hint on the first connection error without it.
 
 ## Key dependencies
 - `androidx.media3` (exoplayer, exoplayer-hls, session) — playback, session, HLS.
@@ -73,7 +74,7 @@ Minimalist Android internet radio player; imports M3U/PLS streams, searches radi
 - Wrapper present. Debug APK: `./gradlew assembleDebug`. Release APK: `./gradlew assembleRelease`.
 - **Toolchain:** Gradle 9.6.1, AGP 9.4.0, Kotlin 2.3.21, Java/Kotlin target 17; versions live in `gradle/libs.versions.toml`. Daemon JVM pinned to JetBrains Runtime 21 by `gradle/gradle-daemon-jvm.properties`. Android build-tools unpinned — use Android Studio's bundled version.
 - `local.properties` must define `sdk.dir`. No other entries required by the build script.
-- Release: `optimization { enable = true }` on the release build type; keep rules in `app/src/main/keepRules/rules.keep`.
+- Release: `optimization { enable = true }` on the release build type; keep rules in `app/src/main/keepRules/rules.keep`. Debug installs beside release: `applicationIdSuffix ".debug"`, label "Transistor (debug)" via the `appLabel` manifest placeholder (`app/src/debug/res/values/strings.xml`).
 - No product flavors. No `signingConfigs` in `app/build.gradle.kts` — release signing done manually via Android Studio.
 - Lint: `MissingTranslation` disabled.
 - `dependenciesInfo.includeInApk = false` and `includeInBundle = false`.
