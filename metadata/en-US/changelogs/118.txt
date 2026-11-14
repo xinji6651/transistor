@@ -1,0 +1,7 @@
+v4.3.11 - The Width of a Circle
+2026-11-14
+
+- streams on the local network play again on Android 17 (new setting: Allow Local Streams)
+- the navigation bar and display cutout no longer cover the play buttons in landscape
+- the keyboard now opens together with the station search
+- updated translations

@@ -14,8 +14,8 @@ android {
         applicationId = "org.y20k.transistor"
         minSdk = 25
         targetSdk = 37
-        versionCode = 117
-        versionName = "4.3.10"
+        versionCode = 118
+        versionName = "4.3.11"
         manifestPlaceholders["appLabel"] = "@string/app_name"
     }
 
